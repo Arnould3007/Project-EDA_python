@@ -24,6 +24,9 @@ Thumbs.db
 .vscode/
 .idea/
 
+# Claude Code local tool config (not part of the project)
+.claude/
+
 # Tableau local temp files (the workbook itself and its extracts are tracked)
 *.tableau-tmp/
 *.twbr
