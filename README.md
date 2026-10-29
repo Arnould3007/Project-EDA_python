@@ -5,17 +5,28 @@
 **Decision maker:** an SME choosing between a fixed-price and a spot-indexed
 electricity contract (a once-a-year, strategic decision — not a day-to-day one).
 
-**Question:** does wind and solar output explain the level and the
+**Question:** do wind and sunshine conditions explain the level and the
 month-to-month volatility of the Spanish day-ahead electricity price, and —
 depending on the consumption profile (weekday-daytime vs. 24/7) — is a
 spot-indexed contract worth the risk compared to a fixed-price one?
+(REE's own production-by-technology series already tells us *how much*
+renewable electricity was generated; weather is what lets an SME reason
+about this *ahead of time*, and situates the 2023–2025 sample against the
+long-run climate normal — see the 1940–2025 comparison below.)
 
 **Population / geography:** Spain mainland, national day-ahead market.
 
 **Period:** January 2023 – September 2025 (hourly). Stopped at 30 September
 2025 because the Spanish day-ahead market moved from hourly to 15-minute
-pricing on 1 October 2025 — confirmed directly against the REE API rather
-than assumed; see the Quality note.
+pricing on 1 October 2025.
+
+Verified directly against the REE `precios-mercados-tiempo-real` endpoint
+(`Precio mercado spot` series), not assumed: on 15 September 2025 the four
+15-minute values inside each hour are identical (e.g. 97.03 / 97.03 / 97.03
+/ 97.03 — hourly data re-shaped into a 15-minute array), while on 1 October
+2025 they genuinely differ (105.10 / 104.24 / 102.28 / 102.00) — proof the
+real quarter-hour pricing starts there. See the collection script / Quality
+note for the reproducible check.
 
 A separate, smaller comparison uses Open-Meteo daily climatology back to 1940
 to check whether 2023–2025 was an unusually windy/calm sample — not part of

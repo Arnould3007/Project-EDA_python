@@ -1,13 +1,17 @@
 [project]
 name = "spain-electricity-weather"
 version = "0.1.0"
-description = "Does wind and solar output explain electricity price level and volatility in Spain, and is a spot-indexed contract worth the risk for an SME?"
+description = "Do wind and sunshine conditions explain electricity price level and volatility in Spain, and is a spot-indexed contract worth the risk for an SME?"
 readme = "README.md"
 authors = [
     { name = "Arnould", email = "aleveque@albertschool.com" }
 ]
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "pandas>=3.1.0",
+    "pyarrow>=26.0.0",
+    "requests>=2.34.2",
+]
 
 [project.scripts]
 spain-electricity-weather = "spain_electricity_weather:main"
@@ -19,8 +23,10 @@ build-backend = "uv_build"
 [dependency-groups]
 dev = [
     "mypy>=2.4.1",
+    "pandas-stubs>=3.0.5.260914",
     "pytest>=9.2.0",
     "ruff>=0.17.3",
+    "types-requests>=2.33.0.20261006",
 ]
 
 [tool.ruff]
@@ -33,8 +39,7 @@ select = ["E", "F", "I", "UP", "B", "SIM"]
 [tool.mypy]
 python_version = "3.13"
 strict = true
-# Third-party packages used below ship no type stubs (pandas-stubs not installed
-# to keep the dependency surface small for a 6-day project); scope mypy to our
-# own code instead of fighting untyped-import errors on every pandas call.
-disallow_untyped_defs = true
-ignore_missing_imports = true
+# strict = true already implies disallow_untyped_defs; pandas-stubs and
+# types-requests cover our two external dependencies, so no blanket
+# ignore_missing_imports is needed. If an untyped library shows up later,
+# add a scoped [[tool.mypy.overrides]] for that one module, with a reason.
