@@ -1,0 +1,40 @@
+[project]
+name = "spain-electricity-weather"
+version = "0.1.0"
+description = "Does wind and solar output explain electricity price level and volatility in Spain, and is a spot-indexed contract worth the risk for an SME?"
+readme = "README.md"
+authors = [
+    { name = "Arnould", email = "aleveque@albertschool.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+spain-electricity-weather = "spain_electricity_weather:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "mypy>=2.4.1",
+    "pytest>=9.2.0",
+    "ruff>=0.17.3",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.13"
+strict = true
+# Third-party packages used below ship no type stubs (pandas-stubs not installed
+# to keep the dependency surface small for a 6-day project); scope mypy to our
+# own code instead of fighting untyped-import errors on every pandas call.
+disallow_untyped_defs = true
+ignore_missing_imports = true
