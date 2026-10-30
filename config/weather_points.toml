@@ -1,0 +1,53 @@
+# Points représentatifs pour la météo nationale (Open-Meteo / ERA5)
+# role : wind | solar | demand — region : communauté autonome (pondération REE)
+# name : unique, [a-z0-9_]+ uniquement (sert de nom de fichier dans data/raw/open_meteo/)
+# lat/lon : point demandé ; la cellule ERA5 réellement servie est conservée dans le snapshot
+
+[[points]]
+name = "soria"
+lat = 41.77
+lon = -2.47
+role = "wind"
+region = "Castilla y León"
+
+[[points]]
+name = "lugo"
+lat = 43.01
+lon = -7.56
+role = "wind"
+region = "Galicia"
+
+[[points]]
+name = "zaragoza"
+lat = 41.65
+lon = -0.88
+role = "wind"
+region = "Aragón"
+
+[[points]]
+name = "ecija"
+lat = 37.54
+lon = -5.08
+role = "solar"
+region = "Andalucía"
+
+[[points]]
+name = "merida"
+lat = 38.92
+lon = -6.34
+role = "solar"
+region = "Extremadura"
+
+[[points]]
+name = "puertollano"
+lat = 38.69
+lon = -4.11
+role = "solar"
+region = "Castilla-La Mancha"
+
+[[points]]
+name = "madrid"
+lat = 40.42
+lon = -3.70
+role = "demand"
+region = "Comunidad de Madrid"

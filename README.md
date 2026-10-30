@@ -12,7 +12,7 @@ spot-indexed contract worth the risk compared to a fixed-price one?
 (REE's own production-by-technology series already tells us *how much*
 renewable electricity was generated; weather is what lets an SME reason
 about this *ahead of time*, and situates the 2023–2025 sample against the
-long-run climate normal — see the 1940–2025 comparison below.)
+WMO 1991–2020 climate normal — see the 1991–2025 comparison below.)
 
 **Population / geography:** Spain mainland, national day-ahead market.
 
@@ -30,9 +30,10 @@ exact request that produced them are frozen in
 `data/raw/ree/_verification/` (captured 2026-10-29), since the `time_trunc`
 parameter this check depends on is not reliably available on demand.
 
-A separate, smaller comparison uses Open-Meteo daily climatology back to 1940
-to check whether 2023–2025 was an unusually windy/calm sample — not part of
-the main hourly join.
+A separate, smaller comparison uses Open-Meteo daily climatology from 1991
+(the WMO 1991–2020 climate normal, extended through September 2025) to check
+whether 2023–2025 was an unusually windy/calm sample — not part of the main
+hourly join.
 
 ## Setup and run
 
