@@ -25,8 +25,10 @@ Verified directly against the REE `precios-mercados-tiempo-real` endpoint
 15-minute values inside each hour are identical (e.g. 97.03 / 97.03 / 97.03
 / 97.03 — hourly data re-shaped into a 15-minute array), while on 1 October
 2025 they genuinely differ (105.10 / 104.24 / 102.28 / 102.00) — proof the
-real quarter-hour pricing starts there. See the collection script / Quality
-note for the reproducible check.
+real quarter-hour pricing starts there. The two raw API responses and the
+exact request that produced them are frozen in
+`data/raw/ree/_verification/` (captured 2026-10-29), since the `time_trunc`
+parameter this check depends on is not reliably available on demand.
 
 A separate, smaller comparison uses Open-Meteo daily climatology back to 1940
 to check whether 2023–2025 was an unusually windy/calm sample — not part of
