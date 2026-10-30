@@ -30,3 +30,8 @@ Thumbs.db
 # Tableau local temp files (the workbook itself and its extracts are tracked)
 *.tableau-tmp/
 *.twbr
+
+# Intermediate pipeline data only; raw snapshots and the final analytical
+# table in data/processed/ are tracked (evaluator must be able to open the
+# workbook without rerunning the pipeline first)
+data/interim/
