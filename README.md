@@ -36,14 +36,23 @@ hourly join.
 ## Setup and run
 
 *(to fill in once the collection scripts exist)*
+### Open-Meteo
+uv run python -m spain_electricity_weather.collect.open_meteo_cli collect   # online, skips files already collected
+uv run python -m spain_electricity_weather.collect.open_meteo_cli rebuild   # offline, from the raw snapshot
 
 ## Sources and access
 
 *(to fill in once the REE and Open-Meteo provenance sheets are written)*
+### Open-Meteo (weather)
+Historical Weather API (ERA5 reanalysis), no API key, CC BY 4.0 (attribution to Open-Meteo and Copernicus C3S).
+Full provenance sheet: [docs/provenance_open_meteo.md](docs/provenance_open_meteo.md).
 
 ## Data locations
 
 *(to fill in once the raw snapshots are collected)*
+### Open-Meteo
+- Raw snapshot (frozen, versioned): `data/raw/open_meteo/` — 14 JSON files, one hourly and one daily file per point.
+- Points configuration: `config/weather_points.toml`.
 
 ## Tableau
 
