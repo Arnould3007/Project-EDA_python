@@ -91,3 +91,24 @@ community. This was investigated and is **not currently available**:
   is recorded as a project limitation rather than silently dropped — if
   REE's endpoint becomes available again, the weighted comparison can be
   added without changing anything upstream of it.
+
+## Weather-to-generation link — not verified, deferred
+
+The project's causal chain is weather -> renewable generation -> price,
+but only the two ends (weather, price) are collected; the middle link is
+assumed, not checked. REE's `generacion/estructura-generacion` (confirmed
+working, unlike `potencia-instalada` above) could provide actual hourly
+wind/solar generation to validate that the averaged wind speed/radiation
+across the weather points tracks real generation.
+
+- **Current limitation, to state explicitly in the Quality note's "What
+  cannot be trusted" section**: *the weather-to-generation link is not
+  verified* — the analysis assumes average wind speed/radiation across
+  the chosen points is a reasonable proxy for renewable generation, but
+  this has not been checked against REE's actual generation data.
+- **Decision**: deferred until after the join and EDA are done (the join
+  is the actual blocker for the rest of the project). Revisit by
+  **2026-11-02 evening**: if the core pipeline (join + EDA) is finished
+  by then, add the hourly wind/solar generation and the validating
+  chart; otherwise this limitation stands as written above for the final
+  submission.
