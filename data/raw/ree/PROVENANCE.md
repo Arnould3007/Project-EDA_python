@@ -44,12 +44,29 @@
   2025-01-01), i.e. the same hourly price reshaped, not real quarter-hour
   pricing (that only starts 2025-10-01, see `_verification/`). Total raw
   entries across all 33 months: 42,929.
-- **Expected analytical rows after parsing**: 1,004 days x 24 hours =
-  **24,096** hourly price points — the parsing step must filter to
-  `minute == 0` to collapse both the plain-hourly (2023-2024) and the
-  reshaped quarter-hour (2025) months to one row per hour consistently.
+- **Analytical rows after parsing**: the naive expectation is 1,004 days x
+  24 hours = 24,096, but the achieved, verified count is **24,095**: the
+  series runs from 2022-12-31T23:00Z to 2025-09-30T21:00Z, because Madrid
+  local midnight on the first day is UTC+1 (23:00 the day before) while
+  23:00 local on the last day is UTC+2 (21:00 the same day) — a net 1-hour
+  boundary effect from the timezone conversion, not a gap. Verified by
+  `check_hourly_coverage` against this exact fixed period (not derived
+  from the data's own min/max, which would hide a truncated snapshot):
+  0 missing hours, 0 unexpected hours, 0 duplicate rows, 0 null prices.
 - **Grain**: one row = one hour of national (peninsular) day-ahead spot
   price, in EUR/MWh
+- **Negative and zero prices are real, not filtered**: 782 hours at a
+  negative price (minimum -15.00 EUR/MWh) and 871 hours at exactly 0,
+  consistent with renewable oversupply. Kept as-is.
+- **28 April 2025 (the Iberian Peninsula blackout) shows no anomaly in
+  this series**, and that is expected, not a data quality problem:
+  day-ahead prices are fixed the previous afternoon, before the blackout
+  happened, so they cannot reflect it. Flagged here so it isn't mistaken
+  for a collection error later.
+- **Duplicate/conflict handling**: `parse_hourly_series` checks for two
+  different prices on the same hour *before* deduplicating, and raises
+  rather than silently keeping one and discarding the other. No such
+  conflict exists in the current 33-month snapshot (checked directly).
 
 ## Installed capacity by region — attempted, not available
 

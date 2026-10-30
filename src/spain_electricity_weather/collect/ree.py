@@ -114,7 +114,11 @@ def parse_hourly_series(raw_dir: Path) -> pd.DataFrame:
     land on the hour mark collapses every month to one row per hour,
     regardless of whether that month's raw file has 24 or ~93 entries/day.
     Timestamps are converted to UTC so the series has no DST-related gap or
-    duplicate around the March/October clock changes.
+    duplicate around the March/October clock changes. Column name
+    (`time_utc`) matches the Open-Meteo side, for a simpler join later.
+
+    Negative and zero prices are real market outcomes (oversupply) and are
+    kept, not filtered.
     """
     rows: list[dict[str, Any]] = []
     for path in sorted(raw_dir.glob("*.json")):
@@ -123,9 +127,19 @@ def parse_hourly_series(raw_dir: Path) -> pd.DataFrame:
             for value in extract_spot_values(day["payload"]):
                 timestamp = pd.Timestamp(value["datetime"])
                 if timestamp.minute == 0:
-                    rows.append({"datetime": timestamp, "price_eur_mwh": value["value"]})
+                    rows.append({"time_utc": timestamp, "price_eur_mwh": value["value"]})
 
     frame = pd.DataFrame(rows)
-    frame["datetime"] = pd.to_datetime(frame["datetime"], utc=True)
-    frame = frame.sort_values("datetime").drop_duplicates("datetime").reset_index(drop=True)
+    frame["time_utc"] = pd.to_datetime(frame["time_utc"], utc=True)
+    frame = frame.sort_values("time_utc").reset_index(drop=True)
+
+    # A dedup alone (keep the first, drop the rest) would silently hide a
+    # genuine conflict, e.g. the same hour priced twice differently across
+    # two raw responses. Checked before any row is dropped, not after.
+    conflicting = frame.groupby("time_utc")["price_eur_mwh"].nunique()
+    conflicting = conflicting[conflicting > 1]
+    if not conflicting.empty:
+        raise ValueError(f"Conflicting prices for the same hour: {list(conflicting.index)}")
+
+    frame = frame.drop_duplicates("time_utc").reset_index(drop=True)
     return frame
