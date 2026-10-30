@@ -8,6 +8,7 @@ from itertools import groupby
 from pathlib import Path
 from typing import Any
 
+import pandas as pd
 import requests
 
 BASE_URL = "https://apidatos.ree.es/en/datos/mercados/precios-mercados-tiempo-real"
@@ -103,3 +104,28 @@ def collect_raw(start: date, end: date, out_dir: Path) -> list[Path]:
         print(f"saved {out_path} ({len(month_payloads)} days)")
 
     return written
+
+
+def parse_hourly_series(raw_dir: Path) -> pd.DataFrame:
+    """Build a clean hourly spot-price series from the frozen raw snapshots.
+
+    From 2025 onward the raw files hold quarter-hour-spaced duplicates of
+    the same hourly value (see PROVENANCE.md); keeping only the values that
+    land on the hour mark collapses every month to one row per hour,
+    regardless of whether that month's raw file has 24 or ~93 entries/day.
+    Timestamps are converted to UTC so the series has no DST-related gap or
+    duplicate around the March/October clock changes.
+    """
+    rows: list[dict[str, Any]] = []
+    for path in sorted(raw_dir.glob("*.json")):
+        days = json.loads(path.read_text(encoding="utf-8"))
+        for day in days:
+            for value in extract_spot_values(day["payload"]):
+                timestamp = pd.Timestamp(value["datetime"])
+                if timestamp.minute == 0:
+                    rows.append({"datetime": timestamp, "price_eur_mwh": value["value"]})
+
+    frame = pd.DataFrame(rows)
+    frame["datetime"] = pd.to_datetime(frame["datetime"], utc=True)
+    frame = frame.sort_values("datetime").drop_duplicates("datetime").reset_index(drop=True)
+    return frame
