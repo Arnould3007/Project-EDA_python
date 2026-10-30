@@ -61,6 +61,6 @@ Defined in `config/weather_points.toml`. The coordinates actually used by the AP
 
 ```
 uv sync
-uv run python -m spain_electricity_weather.collect.open_meteo_cli collect   # online, skips existing files
-uv run python -m spain_electricity_weather.collect.open_meteo_cli rebuild   # offline, from the raw snapshot
+uv run spain-electricity-weather collect-open-meteo   # online, skips existing files
+uv run spain-electricity-weather rebuild-open-meteo   # offline, from the raw snapshot
 ```
