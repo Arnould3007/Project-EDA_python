@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from spain_electricity_weather.collect import open_meteo_cli
 from spain_electricity_weather.collect.ree import collect_raw, parse_hourly_series
 from spain_electricity_weather.quality.ree import check_hourly_coverage
 
@@ -54,9 +55,26 @@ def main() -> None:
         "--out", type=Path, default=Path("data/interim/ree_hourly_prices.csv")
     )
 
+    collect_weather_parser = subparsers.add_parser(
+        "collect-open-meteo", help="Fetch Open-Meteo weather for the configured points"
+    )
+    collect_weather_parser.add_argument(
+        "--config", type=Path, default=Path("config/weather_points.toml")
+    )
+    collect_weather_parser.add_argument("--raw-dir", type=Path, default=Path("data/raw"))
+
+    rebuild_weather_parser = subparsers.add_parser(
+        "rebuild-open-meteo", help="Rebuild Open-Meteo data offline from the frozen raw snapshot"
+    )
+    rebuild_weather_parser.add_argument("--raw-dir", type=Path, default=Path("data/raw"))
+
     args = parser.parse_args()
 
     if args.command == "collect-ree":
         collect_ree(args.raw_dir)
     elif args.command == "parse-ree":
         parse_ree(args.raw_dir, args.out)
+    elif args.command == "collect-open-meteo":
+        open_meteo_cli.collect(args.config, args.raw_dir)
+    elif args.command == "rebuild-open-meteo":
+        open_meteo_cli.rebuild(args.raw_dir)
