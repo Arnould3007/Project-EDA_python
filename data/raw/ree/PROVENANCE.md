@@ -50,3 +50,27 @@
   reshaped quarter-hour (2025) months to one row per hour consistently.
 - **Grain**: one row = one hour of national (peninsular) day-ahead spot
   price, in EUR/MWh
+
+## Installed capacity by region — attempted, not available
+
+For the simple-average-vs-weighted-average comparison of the Open-Meteo
+wind/solar points (see the weather collection's own provenance), the
+weighting would use REE's installed wind/solar capacity (MW) by autonomous
+community. This was investigated and is **not currently available**:
+
+- **Widget identified**: `generacion/potencia-instalada` (confirmed by
+  name against REE's own API documentation; it is the only widget in the
+  `generacion` category that matches "installed capacity" — the similarly
+  named `estructura-generacion` returns annual generation *output* in MWh,
+  a different quantity, not a substitute)
+- **Tested**: `https://apidatos.ree.es/en/datos/generacion/potencia-instalada`
+  with `geo_limit=ccaa&geo_ids=7` (Castilla-La Mancha), with
+  `geo_limit=peninsular`, and with no geo filter at all (national level) —
+  **all three return `500 Internal Server Error`** (2026-10-30). Getting
+  the same failure with zero geographic parameters rules out a parameter
+  mistake on our side; the widget itself is currently broken on REE's end.
+- **Decision**: default to the **simple average** across the weather
+  points (no capacity weighting), as agreed with the Open-Meteo side. This
+  is recorded as a project limitation rather than silently dropped — if
+  REE's endpoint becomes available again, the weighted comparison can be
+  added without changing anything upstream of it.
