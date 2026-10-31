@@ -1,9 +1,8 @@
 # Quality note
 
-**Status: draft.** The price-weather join exists and runs but is not yet
-merged — two decisions (radiation alignment, boundary rows) are pending
-confirmation on the Open-Meteo side (decision journal D8, D23). Numbers
-below are from that draft.
+**Status: draft.** The price-weather join runs on the real data and its two
+open decisions are settled (decision journal D8, D23). Numbers below come
+from the `feature/price-weather-join` branch.
 
 ## Coverage and integration checks
 
@@ -25,21 +24,27 @@ below are from that draft.
 
 - **Join key**: UTC hour, 1-1 relationship, enforced (`validate="one_to_one"`
   — a duplicated key fails loudly instead of silently multiplying rows).
-- **Radiation alignment** (D8, pending confirmation): Open-Meteo's solar
-  radiation at hour T is the average of [T-1, T), while REE's price at T
-  covers [T, T+1). Shifted radiation by one hour so both describe the same
-  interval.
+- **Radiation alignment** (D8): Open-Meteo's solar radiation at hour T is
+  the average of [T-1, T), while REE's price at T covers [T, T+1).
+  Radiation is shifted by one hour so both describe the same interval.
 - **National weather**: simple average per role (wind points for wind,
-  solar points for solar); a capacity-weighted alternative was planned but
-  REE's installed-capacity endpoint (`generacion/potencia-instalada`)
-  returns `500` regardless of parameters — confirmed broken server-side,
-  not a request error (see `data/raw/ree/PROVENANCE.md`).
+  solar points for solar, all 7 points for temperature). A
+  capacity-weighted alternative was planned but REE's installed-capacity
+  endpoint (`generacion/potencia-instalada`) returns `500` regardless of
+  parameters — confirmed broken server-side, not a request error (see
+  `data/raw/ree/PROVENANCE.md`).
 - **Negative and zero prices** (782 and 871 hours respectively, min -15
   EUR/MWh): kept, not filtered — real market outcomes from renewable
   oversupply, not errors.
-- **28 April 2025 (Iberian blackout)**: shows no anomaly in the price
-  series, and that's expected: day-ahead prices are fixed the previous
-  afternoon, before the blackout happened.
+- **28 April 2025 (Iberian blackout)**: kept. It shows no anomaly in the
+  price series, and that's expected: day-ahead prices are fixed the
+  previous afternoon, before the blackout happened.
+- **Climatology** (D24): each sample month is compared with the 1991-2020
+  normal of the same calendar month. The sample holds three
+  January-September seasons but only two October-December ones; a plain
+  mean over the sample over-weights spring and summer and made the sample
+  look about 4-5% sunnier than normal on its own. Temperature deviations
+  are reported in degrees C, not %, since Celsius has an arbitrary zero.
 
 ## What cannot be trusted
 
@@ -54,15 +59,18 @@ below are from that draft.
   capacity-weighted alternative could not be built (see above).
 - **Market granularity change, October 2025.** The study stops
   2025-09-30; results do not cover the 15-minute market that followed.
-- **Climatology sample.** Checked directly: 2023-2025 was close to the
-  1991-2020 normal for wind (within ~1-2.5%), but warmer (+7 to +12%) and
-  slightly sunnier (+4-5%) on every point — the indexed-contract risk from
-  wind specifically is not obviously under- or over-stated by the sample,
-  but the sample was not climate-neutral either.
+- **Climatology sample.** Compared month by month with the 1991-2020
+  normal, 2023-2025 was close to normal for wind (-3.5% at Zaragoza,
+  within ±1.5% elsewhere) and for solar radiation (within ±1%), but
+  warmer on every point (+0.7 to +1.1 °C). The indexed-contract risk from
+  wind and sun is not obviously under- or over-stated by the sample; the
+  warmer years may have pushed demand, hence prices, in summer.
 - **Wind speed averaged, not generation.** Wind power scales roughly with
   the cube of speed between cut-in and rated speed; averaging speeds
   smooths out peaks. Not checked against REE's actual wind generation
   (`generacion/estructura-generacion`, confirmed available) — deferred
   past the join/EDA, revisited 2026-11-02 evening if time allows.
-- **Capacity weighting uses 6 regions only**, each represented by a single
-  point; other producing regions are absent from that (unused) weighting.
+- **Consumption profile ignores public holidays.** The weekday-daytime
+  profile treats Spanish national holidays as working days; about 8-9
+  days a year are counted as consumption days when an SME would likely
+  be closed.
