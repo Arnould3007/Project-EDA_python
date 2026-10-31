@@ -1,0 +1,13 @@
+{
+  "price_rows": 24095,
+  "weather_rows": 24096,
+  "joined_rows": 24094,
+  "price_only": [
+    "2022-12-31 23:00:00+00:00"
+  ],
+  "weather_only": [
+    "2025-09-30 22:00:00+00:00",
+    "2025-09-30 23:00:00+00:00"
+  ],
+  "dropped_for_missing_values": []
+}
