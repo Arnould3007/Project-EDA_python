@@ -70,7 +70,10 @@ def monthly_volatility(monthly_prices: pd.Series) -> float:
     return float(monthly_prices.std())
 
 
-SENSITIVITY_SPLIT = pd.Timestamp("2024-01-01", tz="UTC")
+# Madrid local time, like the monthly grouping: 2024-01-01 00:00 in Madrid is
+# 2023-12-31 23:00 UTC. A UTC split would leave January 2024's first hour out
+# of the 2024-2025 window and inconsistent with the monthly breakdown.
+SENSITIVITY_SPLIT = pd.Timestamp("2024-01-01", tz="Europe/Madrid")
 
 
 def sensitivity_comparison(frame: pd.DataFrame, profile: str) -> dict[str, float]:
