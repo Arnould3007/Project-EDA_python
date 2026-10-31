@@ -96,4 +96,20 @@ The detailed quality report is available from
 
 ## Contributions
 
-*(to fill in — per-person branches/PRs, see git log)*
+Each source was collected, parsed and quality-checked by one person, then
+reviewed by the other before merging — both members can explain either
+side of the pipeline.
+
+| Branch / PR | Author | Scope |
+|---|---|---|
+| `feature/ree-collection` (PR #2) | Arnould | REE price collection, parsing, quality checks, CLI |
+| `feature/open-meteo` (PR #1) | Paul | Open-Meteo weather collection, quality checks |
+| `feature/open-meteo-provenance` (PR #3) | Paul | Open-Meteo provenance sheet, CLI wiring |
+| `feature/national-weather` | Paul | National weather aggregation (simple average by role) |
+| `feature/price-weather-join` | Arnould | Price x weather join, consumption-profile KPIs, sensitivity and climatology comparisons |
+
+Review notes worth keeping visible: PR #2 was reviewed in detail before
+merging and several fixes came out of it directly (`check_hourly_coverage`
+blind to a truncated snapshot, a duplicate-price conflict silently
+resolved by `drop_duplicates` before the quality check ran, a missing
+`ruff format --check`) — see that PR's commit history for the before/after.
