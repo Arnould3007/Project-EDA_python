@@ -89,3 +89,18 @@ def test_sensitivity_comparison_isolates_the_2024_2025_window() -> None:
 
     assert result["full_period_break_even_eur_mwh"] == pytest.approx((100 + 10 + 20) / 3)
     assert result["2024_2025_break_even_eur_mwh"] == pytest.approx((10 + 20) / 2)
+
+
+def test_sensitivity_split_is_midnight_in_madrid_not_utc() -> None:
+    """2023-12-31 23:00 UTC is 2024-01-01 00:00 in Madrid: it belongs to the
+    2024-2025 window, consistently with the Madrid monthly grouping."""
+    frame = pd.DataFrame(
+        {
+            "time_utc": _times("2023-12-31T22:00Z", "2023-12-31T23:00Z"),
+            "price_eur_mwh": [100.0, 10.0],
+        }
+    )
+
+    result = sensitivity_comparison(frame, "always_on")
+
+    assert result["2024_2025_break_even_eur_mwh"] == pytest.approx(10.0)
