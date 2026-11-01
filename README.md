@@ -143,7 +143,7 @@ side of the pipeline.
 | `feature/open-meteo-provenance` (PR #3) | Paul | Open-Meteo provenance sheet, CLI wiring |
 | `feature/national-weather` (PR #4) | Paul | National weather aggregation (simple average by role) |
 | `feature/price-weather-join` | Arnould, reviewed and fixed by Paul | Price x weather join, consumption-profile KPIs, sensitivity and climatology comparisons. Review fixes by Paul: climatology compared month by month (the plain mean over-weighted spring and summer), sensitivity split at midnight Madrid time, quality note update |
-| `feature/eda` | Paul | EDA module and tests, `build-analysis` pipeline command, `docs/eda.md`, README |
+| `feature/eda` | Paul | EDA module and tests, `build-analysis` pipeline command, `docs/eda.md`, final one-page quality note, README |
 
 Review notes worth keeping visible: PR #2 was reviewed in detail before
 merging and several fixes came out of it directly (`check_hourly_coverage`
