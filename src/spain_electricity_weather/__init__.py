@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pandas as pd
 
+from spain_electricity_weather.analysis.pipeline import build_analysis
 from spain_electricity_weather.collect import open_meteo_cli
 from spain_electricity_weather.collect.ree import collect_raw, parse_hourly_series
 from spain_electricity_weather.quality.ree import check_hourly_coverage
@@ -68,6 +69,14 @@ def main() -> None:
     )
     rebuild_weather_parser.add_argument("--raw-dir", type=Path, default=Path("data/raw"))
 
+    analysis_parser = subparsers.add_parser(
+        "build-analysis",
+        help="Join prices and weather, then write the EDA tables (offline, from raw snapshots)",
+    )
+    analysis_parser.add_argument("--ree-raw-dir", type=Path, default=Path("data/raw/ree"))
+    analysis_parser.add_argument("--weather-raw-dir", type=Path, default=Path("data/raw"))
+    analysis_parser.add_argument("--out-dir", type=Path, default=Path("data/processed"))
+
     args = parser.parse_args()
 
     if args.command == "collect-ree":
@@ -78,3 +87,5 @@ def main() -> None:
         open_meteo_cli.collect(args.config, args.raw_dir)
     elif args.command == "rebuild-open-meteo":
         open_meteo_cli.rebuild(args.raw_dir)
+    elif args.command == "build-analysis":
+        build_analysis(args.ree_raw_dir, args.weather_raw_dir, args.out_dir)

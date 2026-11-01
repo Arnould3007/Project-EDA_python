@@ -1,0 +1,2 @@
+coef_wind_100m_ms,coef_solar_wm2,coef_temp_c,r2_calendar_only,r2_with_weather
+-8.678,-0.092,0.112,0.372,0.573
