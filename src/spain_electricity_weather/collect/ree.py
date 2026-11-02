@@ -39,7 +39,7 @@ def fetch_day_raw(day: date) -> dict[str, Any]:
             return payload
         last_error = RuntimeError(f"REE API error for {day}: {payload['errors']}")
         if attempt < MAX_RETRIES:
-            time.sleep(RETRY_DELAY_SECONDS * attempt)  # exponential backoff
+            time.sleep(RETRY_DELAY_SECONDS * attempt)  # linear backoff: 5 s, then 10 s
 
     assert last_error is not None
     raise last_error
