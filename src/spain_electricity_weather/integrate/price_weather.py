@@ -1,8 +1,8 @@
 """Join REE hourly prices with the national weather aggregate.
 
-PROVISIONAL: the radiation alignment below is our best-judgement call,
-not yet confirmed with the Open-Meteo side. Flagged clearly so it is easy
-to review or correct.
+Radiation is shifted by one hour before the join (decision D8, validated):
+Open-Meteo radiation at T covers [T-1, T), the REE price at T covers
+[T, T+1).
 """
 
 from __future__ import annotations
