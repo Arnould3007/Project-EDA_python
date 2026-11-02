@@ -128,7 +128,20 @@ length 100) and `ruff format` run on the whole repository (`src/` and
 
 ## Tableau
 
-*(to fill in once the workbook is built)*
+[`tableau/spain_electricity_weather_dashboard.twbx`](tableau/spain_electricity_weather_dashboard.twbx) —
+packaged workbook, open with Tableau Desktop or the free Tableau Reader. Built
+from `data/processed/price_weather_hourly.csv` and the EDA tables in
+`data/processed/eda/`. Three dashboards:
+
+- **1 - Decision: fixed or indexed?** — the bounded answer as a decision
+  tool: break-even price per consumption profile (full period and
+  2024-2025), and an interactive slider to compare a chosen fixed-price
+  offer against the monthly indexed cost.
+- **2 - Sun and wind** — the hourly solar dip by season, and the wind-price
+  relationship on all hours vs. at night only (to separate the wind effect
+  from the solar one).
+- **3 - Robustness checks** — windy vs. calm months by year, and the
+  climatology check against the 1991-2020 normal.
 
 ## Contributions
 
