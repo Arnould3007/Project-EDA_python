@@ -128,7 +128,29 @@ length 100) and `ruff format` run on the whole repository (`src/` and
 
 ## Tableau
 
-*(to fill in once the workbook is built)*
+[`tableau/spain_electricity_weather_dashboard.twbx`](tableau/spain_electricity_weather_dashboard.twbx) —
+packaged workbook, open with Tableau Desktop or the free Tableau Reader.
+Connected to the CSVs in `data/processed/eda/` (not `price_weather_hourly.csv`
+directly). Three dashboards:
+
+- **1 - Decision: fixed or indexed?** — the bounded answer as a decision
+  tool: break-even price per consumption profile (full period and
+  2024-2025), and an interactive slider to compare a chosen fixed-price
+  offer against the monthly indexed cost.
+- **2 - Sun and wind** — the hourly solar dip by season, and the wind-price
+  relationship on all hours vs. at night only (to separate the wind effect
+  from the solar one).
+- **3 - Robustness checks** — windy vs. calm months by year, and the
+  climatology check against the 1991-2020 normal.
+
+The break-even figures on dashboard 1 are typed text, copied from
+`indexed_risk.csv`, not a connected field — they do not update if
+`build-analysis` is rerun with different data.
+
+**Refreshing the data**: after rerunning `build-analysis`, point Tableau at
+the new output (*Data* > *Edit Data Source...*) to the `data/processed/eda/`
+folder of your own clone; the workbook keeps the path from the machine it
+was built on.
 
 ## Contributions
 
