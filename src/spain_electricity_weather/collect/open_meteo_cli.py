@@ -1,12 +1,12 @@
-"""Commandes Open-Meteo : collecte en ligne et reconstruction hors ligne depuis le snapshot brut.
+"""Open-Meteo commands: online collection and offline rebuild from the raw snapshot.
 
-Usage, depuis la racine du projet :
+Usage, from the project root:
     uv run python -m spain_electricity_weather.collect.open_meteo_cli collect
     uv run python -m spain_electricity_weather.collect.open_meteo_cli rebuild
 
-`collect` interroge l'API et gèle les réponses dans data/raw/open_meteo/ (les fichiers déjà
-présents sont conservés). `rebuild` relit uniquement le snapshot, sans appel réseau, et
-affiche la couverture obtenue par point.
+`collect` queries the API and freezes the responses in data/raw/open_meteo/ (files already
+present are kept). `rebuild` only reads the snapshot back, with no network call, and
+prints the coverage obtained for each point.
 """
 
 from __future__ import annotations
@@ -28,19 +28,19 @@ DEFAULT_RAW_DIR = Path("data/raw")
 
 
 def coverage_summary(df: pd.DataFrame, time_col: str) -> pd.DataFrame:
-    """Une ligne par point : nombre de lignes, premier et dernier pas de temps."""
+    """One row per point: number of rows, first and last time step."""
     summary = df.groupby("point")[time_col].agg(["count", "min", "max"])
     return summary.rename(columns={"count": "rows", "min": "first", "max": "last"})
 
 
 def collect(config_path: Path, raw_dir: Path) -> None:
-    """Collecte en ligne ; les fichiers bruts déjà présents sont conservés."""
+    """Online collection; raw files already present are kept."""
     written = collect_open_meteo(config_path, raw_dir)
     print(f"{len(written)} raw files in {raw_dir / 'open_meteo'}")
 
 
 def rebuild(raw_dir: Path) -> None:
-    """Reconstruction hors ligne depuis le snapshot brut, avec la couverture par point."""
+    """Offline rebuild from the raw snapshot, with the coverage for each point."""
     hourly = load_hourly_from_raw(raw_dir)
     daily = load_daily_from_raw(raw_dir)
     print("Hourly weather (UTC):")
