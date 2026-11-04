@@ -1,4 +1,4 @@
-"""Tests de la commande rebuild : reconstruction hors ligne et résumé de couverture."""
+"""Tests for the rebuild command: offline rebuild and coverage summary."""
 
 from __future__ import annotations
 

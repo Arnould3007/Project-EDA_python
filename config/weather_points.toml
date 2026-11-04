@@ -1,7 +1,7 @@
-# Points représentatifs pour la météo nationale (Open-Meteo / ERA5)
-# role : wind | solar | demand — region : communauté autonome (pondération REE)
-# name : unique, [a-z0-9_]+ uniquement (sert de nom de fichier dans data/raw/open_meteo/)
-# lat/lon : point demandé ; la cellule ERA5 réellement servie est conservée dans le snapshot
+# Representative points for national weather (Open-Meteo / ERA5)
+# role: wind | solar | demand — region: autonomous community (REE weighting)
+# name: unique, [a-z0-9_]+ only (used as the file name in data/raw/open_meteo/)
+# lat/lon: requested point; the ERA5 grid cell actually served is kept in the snapshot
 
 [[points]]
 name = "soria"

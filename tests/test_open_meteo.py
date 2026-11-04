@@ -1,4 +1,4 @@
-"""Tests de la collecte Open-Meteo : lecture du snapshot brut, sans réseau."""
+"""Tests for the Open-Meteo collection: reading the raw snapshot, with no network."""
 
 from __future__ import annotations
 
@@ -43,17 +43,17 @@ CONFIG = Path(__file__).parents[1] / "config" / "weather_points.toml"
 
 @pytest.fixture(autouse=True)
 def no_network(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Toute tentative de connexion réelle fait échouer le test."""
+    """Any attempt at a real connection makes the test fail."""
 
     def refuse(*_args: object, **_kwargs: object) -> None:
-        raise AssertionError("Appel réseau interdit dans les tests")
+        raise AssertionError("Network calls are forbidden in tests")
 
     monkeypatch.setattr(socket.socket, "connect", refuse)
 
 
 @pytest.fixture
 def sleeps(monkeypatch: pytest.MonkeyPatch) -> list[float]:
-    """Remplace `time.sleep` et enregistre les attentes demandées."""
+    """Replace `time.sleep` and record the requested waits."""
     recorded: list[float] = []
     monkeypatch.setattr(time, "sleep", recorded.append)
     return recorded
@@ -80,7 +80,7 @@ def _hourly_payload(n_hours: int = 3) -> dict[str, Any]:
 
 
 def _full_hourly_payload() -> dict[str, Any]:
-    """Réponse couvrant exactement la période attendue, sans aucune anomalie."""
+    """Response covering exactly the expected period, with no anomaly at all."""
     times = expected_times("hourly").strftime("%Y-%m-%dT%H:%M").tolist()
     payload = _hourly_payload(0)
     payload["hourly"] = {
@@ -133,7 +133,7 @@ def _response(
 ) -> requests.Response:
     response = requests.Response()
     response.status_code = status
-    response._content = body  # seule façon de fixer le corps d'une réponse sans serveur
+    response._content = body  # only way to set a response body without a server
     response.headers.update(headers or {})
     return response
 
@@ -166,17 +166,17 @@ def test_load_points_rejects_duplicate_names(tmp_path: Path) -> None:
     block = 'name = "soria"\nlat = 41.77\nlon = -2.47\nrole = "wind"\nregion = "CyL"\n'
     config.write_text(f"[[points]]\n{block}\n[[points]]\n{block}", encoding="utf-8")
 
-    with pytest.raises(ValueError, match="en double"):
+    with pytest.raises(ValueError, match="Duplicate point names"):
         load_points(config)
 
 
 @pytest.mark.parametrize(
     ("name", "lat", "lon", "role", "message"),
     [
-        ("Soria", 41.77, -2.47, "wind", "invalide"),  # collision de casse sur macOS
-        ("../soria", 41.77, -2.47, "wind", "invalide"),  # sortirait de data/raw
-        ("soria", 41.77, -2.47, "hydro", "rôle inconnu"),
-        ("soria", -2.47, 41.77, "wind", "hors de l'Espagne"),  # lat et lon inversées
+        ("Soria", 41.77, -2.47, "wind", "Invalid"),  # case collision on macOS
+        ("../soria", 41.77, -2.47, "wind", "Invalid"),  # would escape data/raw
+        ("soria", 41.77, -2.47, "hydro", "unknown role"),
+        ("soria", -2.47, 41.77, "wind", "outside mainland Spain"),  # lat and lon swapped
     ],
 )
 def test_load_points_rejects_invalid_point(
@@ -193,11 +193,11 @@ def test_load_points_rejects_empty_config(tmp_path: Path) -> None:
     config = tmp_path / "points.toml"
     config.write_text("", encoding="utf-8")
 
-    with pytest.raises(ValueError, match="Aucun point"):
+    with pytest.raises(ValueError, match="No point"):
         load_points(config)
 
 
-# --- Paramètres, période attendue et quotas ----------------------------------------------------
+# --- Parameters, expected period and quotas ---------------------------------------------------
 
 
 def test_archive_endpoint() -> None:
@@ -216,7 +216,7 @@ def test_build_params(kind: str, start: str, variables: str) -> None:
 
     assert params["timezone"] == "GMT"
     assert params["wind_speed_unit"] == "ms"
-    assert params["models"] == "era5"  # sans quoi best_match mélange IFS, ERA5 et ERA5-Land
+    assert params["models"] == "era5"  # otherwise best_match mixes IFS, ERA5 and ERA5-Land
     assert params["start_date"] == start
     assert params["end_date"] == "2025-09-30"
     assert params[kind] == variables
@@ -224,9 +224,9 @@ def test_build_params(kind: str, start: str, variables: str) -> None:
 
 
 def test_unknown_kind_is_rejected() -> None:
-    with pytest.raises(ValueError, match="kind inconnu"):
+    with pytest.raises(ValueError, match="unknown kind"):
         build_params(POINT, "monthly")
-    with pytest.raises(ValueError, match="kind inconnu"):
+    with pytest.raises(ValueError, match="unknown kind"):
         parse_response(_record(_hourly_payload()), "monthly")
 
 
@@ -285,11 +285,11 @@ def test_fetch_does_not_retry_other_4xx(status: int, sleeps: list[float]) -> Non
 def test_fetch_gives_up_without_waiting_after_last_attempt(sleeps: list[float]) -> None:
     session = _session(*[_response(429) for _ in range(MAX_ATTEMPTS)])
 
-    with pytest.raises(RuntimeError, match="Échec après"):
+    with pytest.raises(RuntimeError, match="Failed after"):
         fetch({}, session)
     assert session.get.call_count == MAX_ATTEMPTS
     assert sleeps == [5.0, 10.0, 20.0, 40.0]
-    assert sum(sleeps) > 60  # la fenêtre d'une minute de l'API est forcément dépassée
+    assert sum(sleeps) > 60  # the API's one-minute window is necessarily exceeded
 
 
 def test_fetch_honours_retry_after_up_to_a_cap(sleeps: list[float]) -> None:
@@ -309,9 +309,9 @@ def test_fetch_honours_retry_after_up_to_a_cap(sleeps: list[float]) -> None:
     "failure",
     [
         requests.ConnectionError("coupure"),
-        requests.Timeout("délai"),
-        requests.exceptions.ChunkedEncodingError("réponse coupée"),
-        _response(200, b'{"hourly": [1, 2'),  # corps tronqué malgré un code 200
+        requests.Timeout("timeout"),
+        requests.exceptions.ChunkedEncodingError("response cut off"),
+        _response(200, b'{"hourly": [1, 2'),  # truncated body despite a 200 status
     ],
 )
 def test_fetch_retries_transport_failures(
@@ -323,7 +323,7 @@ def test_fetch_retries_transport_failures(
     assert sleeps == [5.0]
 
 
-# --- parse_response : contrat de la réponse ------------------------------------------------------
+# --- parse_response: response contract -----------------------------------------------------------
 
 
 def test_parse_hourly_is_utc_and_keeps_grid_and_requested_coordinates() -> None:
@@ -332,7 +332,7 @@ def test_parse_hourly_is_utc_and_keeps_grid_and_requested_coordinates() -> None:
     assert len(df) == 3
     assert str(df["time_utc"].dt.tz) == "UTC"
     assert df["time_utc"].iloc[0] == pd.Timestamp("2024-04-01T00:00", tz="UTC")
-    # Les coordonnées renvoyées (cellule ERA5) sont conservées, en plus de celles demandées.
+    # The returned coordinates (ERA5 cell) are kept, in addition to the requested ones.
     assert df["grid_lat"].iloc[0] == 41.75
     assert df["grid_lon"].iloc[0] == -2.5
     assert df["requested_lat"].iloc[0] == POINT.lat
@@ -352,9 +352,9 @@ def test_parse_does_not_shift_radiation() -> None:
 @pytest.mark.parametrize("variable", ["wind_speed_100m", "shortwave_radiation", "temperature_2m"])
 def test_parse_rejects_unexpected_unit(variable: str) -> None:
     payload = _hourly_payload()
-    payload["hourly_units"][variable] = "km/h"  # oubli de wind_speed_unit=ms, par exemple
+    payload["hourly_units"][variable] = "km/h"  # e.g. forgetting wind_speed_unit=ms
 
-    with pytest.raises(ValueError, match="unité inattendue"):
+    with pytest.raises(ValueError, match="unexpected unit"):
         parse_response(_record(payload), "hourly")
 
 
@@ -362,7 +362,7 @@ def test_parse_rejects_unexpected_daily_unit() -> None:
     payload = _full_daily_payload()
     payload["daily_units"]["shortwave_radiation_sum"] = "kWh/m²"
 
-    with pytest.raises(ValueError, match="unité inattendue"):
+    with pytest.raises(ValueError, match="unexpected unit"):
         parse_response(_record(payload), "daily")
 
 
@@ -370,32 +370,32 @@ def test_parse_rejects_non_iso_time_unit() -> None:
     payload = _hourly_payload()
     payload["hourly_units"]["time"] = "unixtime"
 
-    with pytest.raises(ValueError, match="unité inattendue pour time"):
+    with pytest.raises(ValueError, match="unexpected unit for time"):
         parse_response(_record(payload), "hourly")
 
 
 def test_parse_rejects_non_utc_response() -> None:
     payload = _hourly_payload()
-    payload["utc_offset_seconds"] = 7200  # réponse en heure locale espagnole
+    payload["utc_offset_seconds"] = 7200  # response in Spanish local time
 
-    with pytest.raises(ValueError, match="non UTC"):
+    with pytest.raises(ValueError, match="non-UTC"):
         parse_response(_record(payload), "hourly")
 
 
 def test_parse_rejects_series_of_different_lengths() -> None:
     payload = _hourly_payload()
-    payload["hourly"]["temperature_2m"] = [2.9, 3.0]  # une valeur manquante
+    payload["hourly"]["temperature_2m"] = [2.9, 3.0]  # one value missing
 
-    with pytest.raises(ValueError, match="longueurs différentes"):
+    with pytest.raises(ValueError, match="different lengths"):
         parse_response(_record(payload), "hourly")
 
 
 def test_parse_rejects_variable_series_shorter_than_time_only() -> None:
     payload = _hourly_payload()
     for variable in ("wind_speed_100m", "shortwave_radiation", "temperature_2m"):
-        payload["hourly"][variable] = [1.0, 2.0]  # cohérentes entre elles, pas avec `time`
+        payload["hourly"][variable] = [1.0, 2.0]  # consistent with each other, not with `time`
 
-    with pytest.raises(ValueError, match="longueurs différentes"):
+    with pytest.raises(ValueError, match="different lengths"):
         parse_response(_record(payload), "hourly")
 
 
@@ -403,7 +403,7 @@ def test_parse_rejects_missing_variable() -> None:
     payload = _hourly_payload()
     del payload["hourly"]["temperature_2m"]
 
-    with pytest.raises(ValueError, match="variables absentes"):
+    with pytest.raises(ValueError, match="variables missing"):
         parse_response(_record(payload), "hourly")
 
 
@@ -415,7 +415,7 @@ def test_parse_rejects_api_error_body() -> None:
 
 
 def test_parse_rejects_grid_cell_far_from_requested_point() -> None:
-    with pytest.raises(ValueError, match="trop éloignée"):
+    with pytest.raises(ValueError, match="too far"):
         parse_response(_record(_hourly_payload(), OTHER_POINT), "hourly")
 
 
@@ -462,13 +462,13 @@ def test_check_coverage_rejects_missing_hour(index: int) -> None:
     payload = _full_hourly_payload()
     _drop_row(payload, "hourly", index)
 
-    with pytest.raises(ValueError, match="couverture hourly incorrecte"):
+    with pytest.raises(ValueError, match="incorrect hourly coverage"):
         check_coverage(parse_response(_record(payload), "hourly"), "hourly")
 
 
 def test_check_coverage_rejects_duplicate_even_with_right_row_count() -> None:
     payload = _full_hourly_payload()
-    _duplicate_row(payload, "hourly", 100)  # 24 096 lignes, mais un doublon et un trou
+    _duplicate_row(payload, "hourly", 100)  # 24,096 rows, but one duplicate and one gap
 
     with pytest.raises(ValueError, match="'duplicate_rows': 1"):
         check_coverage(parse_response(_record(payload), "hourly"), "hourly")
@@ -480,7 +480,7 @@ def test_check_coverage_rejects_local_time_axis() -> None:
         (expected_times("hourly") + pd.Timedelta(hours=2)).strftime("%Y-%m-%dT%H:%M").tolist()
     )
 
-    with pytest.raises(ValueError, match="couverture hourly incorrecte"):
+    with pytest.raises(ValueError, match="incorrect hourly coverage"):
         check_coverage(parse_response(_record(payload), "hourly"), "hourly")
 
 
@@ -488,7 +488,7 @@ def test_check_coverage_rejects_missing_day() -> None:
     payload = _full_daily_payload()
     _drop_row(payload, "daily", -1)
 
-    with pytest.raises(ValueError, match="couverture daily incorrecte"):
+    with pytest.raises(ValueError, match="incorrect daily coverage"):
         check_coverage(parse_response(_record(payload), "daily"), "daily")
 
 
@@ -524,7 +524,7 @@ def test_save_raw_freezes_response_with_provenance(tmp_path: Path) -> None:
 
     assert path == tmp_path / "open_meteo" / "hourly_soria.json"
     frozen = json.loads(path.read_text(encoding="utf-8"))
-    assert frozen["response"] == payload  # réponse brute inchangée
+    assert frozen["response"] == payload  # raw response unchanged
     meta = frozen["_meta"]
     assert "OpenMeteo GmbH" in meta["owner"]
     assert meta["url"] == ARCHIVE_URL
@@ -548,7 +548,7 @@ def test_save_raw_never_overwrites_frozen_snapshot_by_default(tmp_path: Path) ->
     path = save_raw(_full_hourly_payload(), POINT, "hourly", params, tmp_path)
     original = path.read_bytes()
 
-    with pytest.raises(FileExistsError, match="déjà gelé"):
+    with pytest.raises(FileExistsError, match="already frozen"):
         save_raw(_full_hourly_payload(), POINT, "hourly", params, tmp_path)
     assert path.read_bytes() == original
 
@@ -563,7 +563,7 @@ def test_save_raw_writes_nothing_for_invalid_response(tmp_path: Path) -> None:
     payload["hourly_units"]["wind_speed_100m"] = "km/h"
     params = build_params(POINT, "hourly")
 
-    with pytest.raises(ValueError, match="unité inattendue"):
+    with pytest.raises(ValueError, match="unexpected unit"):
         save_raw(payload, POINT, "hourly", params, tmp_path)
     assert not list(tmp_path.rglob("*.json*"))
 
@@ -571,7 +571,7 @@ def test_save_raw_writes_nothing_for_invalid_response(tmp_path: Path) -> None:
 def test_save_raw_rejects_incomplete_response(tmp_path: Path) -> None:
     params = build_params(POINT, "hourly")
 
-    with pytest.raises(ValueError, match="couverture"):
+    with pytest.raises(ValueError, match="coverage"):
         save_raw(_hourly_payload(24), POINT, "hourly", params, tmp_path)
     assert not list(tmp_path.rglob("*.json*"))
 
@@ -581,17 +581,17 @@ def test_load_rejects_file_whose_content_is_another_point(tmp_path: Path) -> Non
     path = save_raw(_full_hourly_payload(), POINT, "hourly", params, tmp_path)
     path.rename(path.with_name("hourly_lugo.json"))
 
-    with pytest.raises(ValueError, match="contenu du point 'soria'"):
+    with pytest.raises(ValueError, match="contains point 'soria'"):
         load_hourly_from_raw(tmp_path)
 
 
 def test_load_without_snapshot_fails_explicitly(tmp_path: Path) -> None:
-    with pytest.raises(FileNotFoundError, match="Aucun fichier brut"):
+    with pytest.raises(FileNotFoundError, match="No raw file"):
         load_daily_from_raw(tmp_path)
 
 
 def _freeze_altered_snapshot(payload: dict[str, Any], raw_dir: Path) -> None:
-    """Écrit un fichier brut sans passer par les contrôles de `save_raw`."""
+    """Write a raw file without going through the checks of `save_raw`."""
     params = build_params(POINT, "hourly")
     path = raw_path(raw_dir, "hourly", POINT)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -602,13 +602,13 @@ def _freeze_altered_snapshot(payload: dict[str, Any], raw_dir: Path) -> None:
 def test_load_is_strict_by_default_on_coverage(tmp_path: Path) -> None:
     _freeze_altered_snapshot(_hourly_payload(24), tmp_path)
 
-    with pytest.raises(ValueError, match="couverture"):
+    with pytest.raises(ValueError, match="coverage"):
         load_hourly_from_raw(tmp_path)
     assert len(load_hourly_from_raw(tmp_path, strict=False)) == 24
 
 
 def _freeze_legacy_daily(raw_dir: Path, dropped_day: str | None = None) -> Path:
-    """Écrit un fichier journalier gelé avant le passage à 1991 : il couvre 1940-2025."""
+    """Write a daily file frozen before the switch to 1991: it covers 1940-2025."""
     days = pd.date_range("1940-01-01", "2025-09-30", freq="D").strftime("%Y-%m-%d").tolist()
     if dropped_day is not None:
         days.remove(dropped_day)
@@ -668,7 +668,7 @@ def test_load_hourly_keeps_all_rows(tmp_path: Path) -> None:
     assert len(load_hourly_from_raw(tmp_path, strict=False)) == 24
 
 
-# --- Collecte, sans réseau grâce à un `fetch` factice ---------------------------------------------
+# --- Collection, with no network thanks to a fake `fetch` ---------------------------------------
 
 
 @pytest.fixture
@@ -696,7 +696,7 @@ def test_collect_freezes_hourly_and_daily_and_paces_calls(
 
     assert [path.name for path in written] == ["hourly_soria.json", "daily_soria.json"]
     assert len(calls) == 2
-    # Pause avant le 2e appel, calée sur le poids du 1er et le budget horaire.
+    # Pause before the 2nd call, based on the weight of the 1st and the hourly budget.
     assert sleeps == [0.0, pytest.approx(api_call_weight("hourly") * 3600 / 5000)]
 
 
@@ -748,16 +748,16 @@ def test_collect_prints_one_line_per_file_with_upcoming_pause(
     pause_hourly = api_call_weight("hourly") * 3600 / 5000
     pause_daily = api_call_weight("daily") * 3600 / 5000
     assert capsys.readouterr().out.splitlines() == [
-        f"écrit hourly_soria.json — pause à venir : {pause_hourly:.1f} s",
-        f"écrit daily_soria.json — pause à venir : {pause_daily:.1f} s",
+        f"wrote hourly_soria.json — next pause: {pause_hourly:.1f} s",
+        f"wrote daily_soria.json — next pause: {pause_daily:.1f} s",
     ]
 
     collect_open_meteo(config, raw_dir)
 
-    assert len(calls) == 2  # second passage : aucun appel
+    assert len(calls) == 2  # second run: no call
     assert capsys.readouterr().out.splitlines() == [
-        "sauté hourly_soria.json (déjà gelé) — pause à venir : 0.0 s",
-        "sauté daily_soria.json (déjà gelé) — pause à venir : 0.0 s",
+        "skipped hourly_soria.json (already frozen) — next pause: 0.0 s",
+        "skipped daily_soria.json (already frozen) — next pause: 0.0 s",
     ]
 
 
@@ -778,10 +778,10 @@ def test_collect_skips_legacy_daily_file_without_refetching(
 
     assert ["hourly" in params for params in calls] == [True]
     assert daily_path.read_bytes() == frozen
-    assert "sauté daily_soria.json" in capsys.readouterr().out
+    assert "skipped daily_soria.json" in capsys.readouterr().out
 
 
-# --- Contrôle qualité --------------------------------------------------------------------------
+# --- Quality check -----------------------------------------------------------------------------
 
 
 def _hourly_table(payload: dict[str, Any] | None = None) -> pd.DataFrame:
@@ -825,14 +825,14 @@ def test_quality_report_counts_nan_per_variable_without_dropping_rows() -> None:
     assert row["nan_shortwave_radiation"] == 2
     assert row["nan_temperature_2m"] == 0
     assert row["actual_rows"] == 24_096
-    assert row["coverage_ok"]  # des NaN ne sont pas un défaut de couverture
+    assert row["coverage_ok"]  # NaN values are not a coverage defect
     assert len(df) == 24_096
 
 
 def test_quality_report_flags_each_impossible_value() -> None:
     payload = _full_hourly_payload()
     hourly = payload["hourly"]
-    # 2023-01-01 12:00 UTC : plein jour ; 02:00 UTC : pleine nuit.
+    # 2023-01-01 12:00 UTC: broad daylight; 02:00 UTC: dead of night.
     hourly["wind_speed_100m"][12] = -0.1
     hourly["shortwave_radiation"][12] = -1.0
     hourly["shortwave_radiation"][2] = 3.0
@@ -857,9 +857,9 @@ def test_quality_report_temperature_bounds_are_inclusive() -> None:
 
 def test_quality_report_ignores_daytime_radiation_and_night_nan() -> None:
     payload = _full_hourly_payload()
-    payload["hourly"]["shortwave_radiation"][12] = 500.0  # 12:00 UTC : plein jour
-    payload["hourly"]["shortwave_radiation"][21] = 2.0  # crépuscule d'été possible : toléré
-    payload["hourly"]["shortwave_radiation"][2] = None  # NaN de nuit : déjà compté comme NaN
+    payload["hourly"]["shortwave_radiation"][12] = 500.0  # 12:00 UTC: broad daylight
+    payload["hourly"]["shortwave_radiation"][21] = 2.0  # possible summer twilight: tolerated
+    payload["hourly"]["shortwave_radiation"][2] = None  # night-time NaN: already counted as NaN
 
     row = quality_report(_hourly_table(payload), "hourly").iloc[0]
 
@@ -873,7 +873,7 @@ def test_quality_report_detects_duplicates_and_gaps() -> None:
 
     row = quality_report(_hourly_table(payload), "hourly").iloc[0]
 
-    assert row["actual_rows"] == row["expected_rows"]  # le compte seul ne suffirait pas
+    assert row["actual_rows"] == row["expected_rows"]  # the count alone would not be enough
     assert row["duplicate_rows"] == 1
     assert row["missing_timestamps"] == 1
     assert not row["coverage_ok"]
@@ -932,7 +932,7 @@ def test_quality_report_from_raw_describes_incomplete_snapshot(tmp_path: Path) -
 
     report = quality_report_from_raw(tmp_path, CONFIG, "hourly").set_index("point")
 
-    assert len(report) == 7  # les 6 points non collectés apparaissent aussi
+    assert len(report) == 7  # the 6 uncollected points also appear
     assert report.loc["soria", "actual_rows"] == 24
     assert not report.loc["soria", "coverage_ok"]
     assert report.loc["madrid", "actual_rows"] == 0
@@ -946,5 +946,5 @@ def test_quality_report_from_raw_applies_daily_filter_to_legacy_file(tmp_path: P
     row = report.loc["soria"]
     assert row["actual_rows"] == 12_692
     assert row["unexpected_timestamps"] == 0
-    assert row["nan_shortwave_radiation_sum"] == 0  # le null du 1940-01-01 est hors période
+    assert row["nan_shortwave_radiation_sum"] == 0  # the null of 1940-01-01 is outside the period
     assert row["coverage_ok"]
