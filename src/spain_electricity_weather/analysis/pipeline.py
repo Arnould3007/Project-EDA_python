@@ -1,7 +1,7 @@
 """Final pipeline step: rebuild the analytical outputs from the frozen raw snapshots.
 
 Offline, no network: REE and Open-Meteo raw files -> joined hourly table
-(read by Tableau) + join report + EDA tables + climatology comparison.
+(input of the EDA tables) + join report + EDA tables + climatology comparison.
 """
 
 from __future__ import annotations

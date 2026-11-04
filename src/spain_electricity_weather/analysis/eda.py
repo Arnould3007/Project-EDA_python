@@ -9,7 +9,7 @@ Each function returns a small table that answers one part of the question:
 - `weather_regression`: the weather effect once hour, month and year are held
   fixed, and how much fit weather adds (F2);
 - `monthly_table` / `profile_spread_by_year` / `indexed_risk`: the monthly
-  view an SME signs a contract on (F3, decision journal C5-C8).
+  view an SME signs a contract on (F3).
 
 All calendar grouping is done in Europe/Madrid local time, like the KPIs.
 """
@@ -180,7 +180,7 @@ def profile_spread_by_year(
     Only `months` are kept (January-September by default): 2025 stops in
     September, and October-December is when the daytime profile gains least
     (short days, evening peak). Comparing full 2023-2024 with a partial 2025
-    would inflate the 2025 spread on its own (same issue as D24).
+    would inflate the 2025 spread on its own.
     """
     local = _local(frame)
     kept = local.dt.month.isin(months)
@@ -221,7 +221,7 @@ def windy_vs_calm_months(frame: pd.DataFrame) -> pd.DataFrame:
 
 def indexed_risk(frame: pd.DataFrame) -> pd.DataFrame:
     """Per profile: the break-even fixed price over the full period and over
-    2024-2025 (C8), and the spread of the monthly indexed price (C7):
+    2024-2025, and the spread of the monthly indexed price:
     standard deviation, cheapest month, 90th percentile and dearest month."""
     rows = []
     for profile in PROFILES:

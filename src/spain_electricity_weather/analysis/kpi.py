@@ -1,10 +1,10 @@
 """Consumption-profile KPIs: break-even fixed price and monthly volatility.
 
-Two consumption profiles (decision journal C6):
+Two consumption profiles:
 - "weekday_daytime": Mon-Fri 08:00-18:59, Europe/Madrid local time
 - "always_on": every hour (24/7)
 
-The break-even price (C5) is a weight-averaged spot price, which is
+The break-even price is a weight-averaged spot price, which is
 scale-invariant to the weights' absolute level: no separate normalisation
 step is needed to compare the two profiles fairly in EUR/MWh.
 """
@@ -50,7 +50,7 @@ def break_even_price(price: pd.Series, weight: pd.Series) -> float:
 def monthly_break_even_price(frame: pd.DataFrame, profile: str) -> pd.Series:
     """Break-even price per calendar month (Europe/Madrid), ~33 points over
     the project period: enough for a meaningful month-to-month volatility
-    read (C7), unlike a 3-point annual series.
+    read, unlike a 3-point annual series.
     """
     weight = consumption_weight(frame["time_utc"], profile)
     # tz-naive after this point on purpose: the Madrid offset has already
@@ -65,8 +65,8 @@ def monthly_break_even_price(frame: pd.DataFrame, profile: str) -> pd.Series:
 
 
 def monthly_volatility(monthly_prices: pd.Series) -> float:
-    """Std dev of the monthly break-even price (EUR/MWh): the risk measure
-    behind C7, month-to-month, not a near-useless 3-point annual series."""
+    """Std dev of the monthly break-even price (EUR/MWh): the risk measure,
+    month-to-month, not a near-useless 3-point annual series."""
     return float(monthly_prices.std())
 
 
@@ -77,7 +77,7 @@ SENSITIVITY_SPLIT = pd.Timestamp("2024-01-01", tz="Europe/Madrid")
 
 
 def sensitivity_comparison(frame: pd.DataFrame, profile: str) -> dict[str, float]:
-    """C8: full 2023-2025 sample vs 2024-2025 only.
+    """Full 2023-2025 sample vs 2024-2025 only.
 
     Spain's Iberian gas price cap mechanism covered 2023, so that year's
     day-ahead prices are not directly comparable to 2024-2025. Comparing

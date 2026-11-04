@@ -1,11 +1,11 @@
-"""Climatology check (decision journal C4, D16, L5, D24): was 2023-2025 atypical?
+"""Climatology check: was 2023-2025 atypical?
 
 Three years of prices can't say on their own whether the study period was
 unusually windy/calm or sunny/dull. This compares the daily weather during
 the project's study window against the WMO 1991-2020 climate normal, per
 point, so the main hourly analysis can be read in that context.
 
-Seasonal matching (D24): the sample (Jan 2023 - Sep 2025) holds three
+Seasonal matching: the sample (Jan 2023 - Sep 2025) holds three
 January-September seasons but only two October-December ones. A plain mean
 over the sample over-weights spring and summer, which alone makes it look
 sunnier and warmer than a plain annual normal. The comparison is therefore
