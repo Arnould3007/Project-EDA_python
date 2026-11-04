@@ -1,9 +1,9 @@
 {
   "_meta": {
     "source": "Open-Meteo Historical Weather API (ERA5 reanalysis)",
-    "owner": "OpenMeteo GmbH (Suisse) ; données ERA5 : ECMWF / Copernicus C3S",
+    "owner": "OpenMeteo GmbH (Switzerland); ERA5 data: ECMWF / Copernicus C3S",
     "url": "https://archive-api.open-meteo.com/v1/archive",
-    "access_method": "HTTP GET, API REST publique sans clé, réponse JSON",
+    "access_method": "HTTP GET, public REST API with no key, JSON response",
     "params": {
       "latitude": 43.01,
       "longitude": -7.56,
