@@ -54,6 +54,7 @@ Defined in `config/weather_points.toml`. The coordinates actually used by the AP
 - `shortwave_radiation` is an **average over the preceding hour** (value at 12:00 = 11:00–12:00), while wind and temperature are instantaneous. Not shifted at collection; alignment with prices is handled in the join.
 - Wind is at **100 m** in the hourly data (turbine hub height) but at **10 m** in the daily climatology (only daily wind variable available). Climatology comparisons use the 10 m wind.
 - The daily files for **soria, lugo and zaragoza** were collected for 1940–2025 before the period was reduced to 1991. They are kept unchanged (frozen snapshot) and filtered to ≥ 1991-01-01 when loaded.
+- On 4 November 2026, the `owner` and `access_method` fields of the `_meta` block were translated from French to English in the 14 raw files. These two fields are our own provenance notes. The API `response` block and every other `_meta` field (including `extracted_at_utc`) are unchanged.
 - Daily aggregates follow **UTC days**, not Spanish local days.
 - Missing values are kept as NaN and counted in the quality report; they are never dropped silently.
 
