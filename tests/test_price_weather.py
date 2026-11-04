@@ -59,7 +59,7 @@ def test_join_price_weather_matches_every_hour_when_ranges_align() -> None:
 
 def test_join_price_weather_reports_boundary_mismatch_without_dropping_it_silently() -> None:
     """Price starts one hour before weather; weather ends one hour after price —
-    exactly the project's D23 boundary case, on a tiny example."""
+    exactly the project's boundary case, on a tiny example."""
     price = pd.DataFrame(
         {
             "time_utc": pd.to_datetime(["2022-12-31T23:00Z", "2023-01-01T00:00Z"], utc=True),

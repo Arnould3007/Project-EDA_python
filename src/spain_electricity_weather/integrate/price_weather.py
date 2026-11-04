@@ -1,6 +1,6 @@
 """Join REE hourly prices with the national weather aggregate.
 
-Radiation is shifted by one hour before the join (decision D8, validated):
+Radiation is shifted by one hour before the join:
 Open-Meteo radiation at T covers [T-1, T), the REE price at T covers
 [T, T+1).
 """

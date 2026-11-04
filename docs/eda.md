@@ -7,8 +7,8 @@ which rebuilds them offline from the frozen raw snapshots and writes them to
 
 **Scope:** 24,094 hours, January 2023 – September 2025, Spain mainland
 day-ahead price (energy component, EUR/MWh) joined with national wind at
-100 m, solar radiation and temperature (decision journal D1, D20-D23). All
-calendar grouping uses Madrid local time.
+100 m, solar radiation and temperature. All calendar grouping uses Madrid
+local time.
 
 ## Finding 1 — The sun creates a midday price dip that keeps getting deeper
 
@@ -24,7 +24,7 @@ calendar grouping uses Madrid local time.
   24/7 one by **3.3 EUR/MWh in 2023, 7.6 in 2024 and 15.1 in 2025**
   (`profile_spread_by_year.csv`). The advantage doubled each year.
   October-December is excluded from this comparison because 2025 stops in
-  September (same seasonal-mix issue as D24).
+  September.
 
 ## Finding 2 — Wind lowers the price at every hour, beyond a threshold
 
@@ -58,7 +58,7 @@ calendar grouping uses Madrid local time.
 - The sample is not atypical for wind or sun: compared month by month with
   the 1991-2020 normal, wind is within -3.5% to +1.4% and radiation within
   -0.2% to +0.9% at every point; it was warmer by +0.7 to +1.1 °C
-  (`climatology.csv`, D24, L5).
+  (`climatology.csv`).
 
 ## Bounded answer
 
@@ -84,12 +84,12 @@ year with factors outside this dataset (gas price, 2023 gas cap).
 - **Associations, not causal effects.** The regression is descriptive; gas
   price, hydro output and demand are not in the model. Hourly residuals are
   autocorrelated, so no standard errors or p-values are reported.
-- **Weather, not generation** (L6): wind speed and radiation stand for wind
+- **Weather, not generation**: wind speed and radiation stand for wind
   and solar output; the threshold in Finding 2 is consistent with turbine
   behaviour but not checked against REE generation.
 - **33 months** for the monthly risk measures: enough for a range and a
   standard deviation, not for a reliable tail estimate.
-- **Holidays** counted as working days in the daytime profile (L8).
+- **Holidays** counted as working days in the daytime profile.
 
 ## Appendix — hypotheses for further work (not tested)
 

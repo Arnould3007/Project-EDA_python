@@ -46,7 +46,7 @@ def test_climatology_comparison_has_one_row_per_point_and_variable() -> None:
 
 
 def test_uneven_seasons_in_the_sample_do_not_create_a_fake_anomaly() -> None:
-    """D24: a sample identical to the normal month by month, but holding two
+    """A sample identical to the normal month by month, but holding two
     summer months for one winter month, must show no deviation. A plain mean
     over the sample would report it as sunnier than normal."""
     daily = pd.DataFrame(
